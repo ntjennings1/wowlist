@@ -1,10 +1,10 @@
 # Wowlist
 
-A custom wordlist generator.
+A wordlist generation wrapper.
 
 ## Software Requirements
 
-Developing wowlist required the following open-source software packages. W
+Developing wowlist required the following open-source software packages.
 
 - figlet 2.2.5-3.1
 - cewl 6.2.1-1
@@ -32,19 +32,19 @@ cd $WOWLIST_HOME
 
 ### Running
 
-Once inside the coned directory, users can run the following command to use wowlist features:
+Once inside the coned directory, users can enter the following script to use wowlist features:
 ```
-.$WOWLIST_HOME/src/wowlist.sh
+./src/wowlist.sh
 ```
 
-### Preferences
+### Parameters
 
-This section will cover how to customize program preferences.
+Users must indicate valid parameters before obtaining a curated wordlist.
 
-
-#### Word Lenngth
-
-Users can customize the length of 
+- [x] URL to grab words from
+- [x] Minimum word length
+- [x] Maximum crawl depth
+- [x] Run duration
 
 ## Acknowledgements
 

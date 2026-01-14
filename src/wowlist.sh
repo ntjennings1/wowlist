@@ -33,8 +33,37 @@ function logo(){
   figlet "WowList"
 }
 
-function wow(){
+function combine(){
+  echo '[!] Combining filtered words ...'
+}
+
+function filter(){
+  echo '[!] Filtering found words ...'
+
+  len="$1"
+  next=$((len++))
+  lines=()
+  while IFS= read -r line; do
+    if [ "${#line}" -eq "$len" ]; then
+      echo "$line"
+    elif [ "${#line}" -eq "$next" ]; then
+      echo "$line"
+    fi
+    lines+=("$line")
+  done < "$OUT_PATH"
+  echo '[!] Finished filtering.'
+}
+
+function grab(){
+  echo '[!] Grabbing words ...'
   sudo timeout --signal=INT "$4" cewl "$1" -w "$OUT_PATH" -m $2 --with-numbers -d $3
+}
+
+function wow(){
+
+  grab $1 $2 $3 $4
+  filter $2
+
 }
 
 function help(){
@@ -54,7 +83,7 @@ function help(){
 }
 
 function diresolve(){
-  echo "[!] Resolving directory structure."
+  echo "[!] Resolving directory structure ..."
   if [ ! -d "$OUT_DIR" ]; then
     echo "[!] Creating output directory."
     mkdir -p "$OUT_DIR"
@@ -64,7 +93,7 @@ function diresolve(){
 }
 
 function pkgresolve(){
-  echo "[!] Resolving dependencies."
+  echo "[!] Resolving dependencies ..."
   reqs="${PROJECT_DIR}/requirements.txt"
   while IFS= read -r pkg; do
       sudo apt-get install "${pkg}" -y > /dev/null
@@ -73,14 +102,14 @@ function pkgresolve(){
 }
 
 function main(){
-#  clear
+  clear
+  logo
   if [ -n "$1" ]; then
     if [ -n "$2" ]; then
       if [ -n "$3" ]; then
 	if [ -n "$4" ]; then
 	  diresolve
 	  pkgresolve
-	  logo
           wow $1 $2 $3 $4
 	else
 	  throw_exec "time"
