@@ -6,7 +6,6 @@ A wordlist generation wrapper.
 
 Developing wowlist required the following open-source software packages.
 
-- figlet 2.2.5-3.1
 - cewl 6.2.1-1
 
 ## Usage
@@ -22,7 +21,7 @@ git clone https://www.github.com/ntjennings1/wowlist.git
 
 Be sure to give the file execution permissions (with admin privileges):
 ```
-sudo chmod 744 $WOWLIST_HOME -R
+sudo chmod 700 $WOWLIST_HOME -R
 ```
 
 Next, enter the directory of the wowlist project:
@@ -41,10 +40,10 @@ Once inside the coned directory, users can enter the following script to use wow
 
 Users must indicate valid parameters before obtaining a curated wordlist.
 
-- [x] URL to grab words from
-- [x] Minimum word length
-- [x] Maximum crawl depth
-- [x] Run duration
+- ==> URL to grab words from
+- ==> Minimum word length
+- ==> Maximum crawl depth
+- ==> Run duration
 
 ## Acknowledgements
 
