@@ -45,6 +45,13 @@ Users must indicate valid parameters before obtaining a curated wordlist.
 - [x] Maximum crawl depth
 - [x] Run duration
 
+## Metrics
+
+To evaluate run performance, enter the following command:
+```
+./$WOWLIST_HOME/src/eval.sh
+```
+
 ## Acknowledgements
 
 ```

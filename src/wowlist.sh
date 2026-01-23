@@ -70,6 +70,10 @@ EOF
 printf "${NC}"
 }
 
+# Iterates through array rows.
+#
+# Returns:
+#   None
 function iterate_rows(){
   for rowname in "${FORMAT[@]}"; do
     eval "cols=(\"\${$rowname[@]}\")"
@@ -117,6 +121,10 @@ function findformats(){
   iterate_rows "${FORMAT[@]}"
 }
 
+# Combines filtered words based on formatting.
+#
+# Returns:
+#   None
 function combine(){
   echo '[!] Combining filtered words ...'
 
@@ -175,7 +183,6 @@ function grab(){
 #   4 - A run duration
 # Returns:
 #   None
-
 function wow(){
 
   grab $1 $2 $3 $4
