@@ -6,6 +6,8 @@ SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 PROJECT_DIR=$(dirname "$SCRIPT_DIR")
 OUT_DIR="${PROJECT_DIR}/out"
 OUT_PATH="${OUT_DIR}/out.txt"
+FILTERED_PATH="${OUT_DIR}/filtered.txt"
+FORMAT_PATH="${SCRIPT_DIR}/format.csv"
 
 # Inputs
 SYMS=( '!' '#' '&' '*'
@@ -17,7 +19,7 @@ FORMAT=()
 
 # Placeholders
 FILTERED=()
-TEMP=()
+PERM=()
 
 # Throws a specified exception.
 #
@@ -68,12 +70,61 @@ EOF
 printf "${NC}"
 }
 
+function iterate_rows(){
+  for rowname in "${FORMAT[@]}"; do
+    eval "cols=(\"\${$rowname[@]}\")"
+
+    for i in "${!cols[@]}"; do
+      if [ "$i" -eq 0 ]; then
+        printf "${cols[$i]}: "
+      else
+        printf "${cols[$i]}\n"
+      fi
+    done
+  done
+}
+
+function apply(){
+  echo
+}
+
+function permutate(){
+  echo
+}
+
 # Combines filtered words.
 #
 # Results:
 #   None
+function findformats(){
+  echo '[!] Grabbing formatting.'
+
+  local row=0
+  local -a fields
+  FORMAT=() # reset
+
+  while IFS=',' read -r -a fields; do
+    local rowname="row_$row"
+    FORMAT+=("$rowname") # create the row array dynamically
+    eval "$rowname=()"
+    for i in "${!fields[@]}"; do
+      eval "$rowname[$i]=\"${fields[$i]}\""
+    done
+    ((row++))
+  done < "$FORMAT_PATH"
+
+  echo '[!] Formatting acquired.'
+  iterate_rows "${FORMAT[@]}"
+}
+
 function combine(){
   echo '[!] Combining filtered words ...'
+
+  findformats
+  permutate
+  apply
+
+  echo '[!] Finished combining words ...'
 }
 
 # Filters the found words.
@@ -87,14 +138,16 @@ function filter(){
 
   len="$1"
   next=$((len++))
-  lines=()
+  FILTERED=()
+
   while IFS= read -r line; do
     if [ "${#line}" -eq "$len" ]; then
-      echo "$line"
+      FILTERED+=("$line")
+      echo "$line" >> "$FILTERED_PATH"
     elif [ "${#line}" -eq "$next" ]; then
-      echo "$line"
+      FILTERED+=("$line")
+      echo "$line" >> "$FILTERED_PATH"
     fi
-    lines+=("$line")
   done < "$OUT_PATH"
   echo '[!] Finished filtering.'
 }
@@ -127,7 +180,7 @@ function wow(){
 
   grab $1 $2 $3 $4
   filter $2
-
+  combine
 }
 
 # Displays the section help.

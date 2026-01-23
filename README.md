@@ -40,10 +40,10 @@ Once inside the coned directory, users can enter the following script to use wow
 
 Users must indicate valid parameters before obtaining a curated wordlist.
 
-- ==> URL to grab words from
-- ==> Minimum word length
-- ==> Maximum crawl depth
-- ==> Run duration
+- [x] URL to grab words from
+- [x] Minimum word length
+- [x] Maximum crawl depth
+- [x] Run duration
 
 ## Acknowledgements
 
