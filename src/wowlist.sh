@@ -1,11 +1,30 @@
 #!/bin/bash
 
+# Paths
 SCRIPT_PATH=$(readlink -f "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 PROJECT_DIR=$(dirname "$SCRIPT_DIR")
 OUT_DIR="${PROJECT_DIR}/out"
 OUT_PATH="${OUT_DIR}/out.txt"
 
+# Inputs
+SYMS=( '!' '#' '&' '*'
+       '-' '_' '=' '+'
+       ',' '.' '?' '~' '|' )
+NUMS=(1 2 3 4 5 6 7 8 9 0)
+SPACE=" "
+FORMAT=()
+
+# Placeholders
+FILTERED=()
+TEMP=()
+
+# Throws a specified exception.
+#
+# Parameters:
+#   1 - An exception
+# Returns:
+#   None
 function throw_exec(){
   if [ "$1" = "params" ]; then
     echo "[ERR] Requires valid parameters."
@@ -30,6 +49,10 @@ function throw_exec(){
   fi
 }
 
+# Displays the logo.
+#
+# Returns:
+#   None
 function logo(){
 RED='\033[31m'
 NC='\033[0m'
@@ -45,10 +68,20 @@ EOF
 printf "${NC}"
 }
 
+# Combines filtered words.
+#
+# Results:
+#   None
 function combine(){
   echo '[!] Combining filtered words ...'
 }
 
+# Filters the found words.
+#
+# Parameters:
+#   1 - The chosen minimum word length
+# Returns:
+#   None
 function filter(){
   echo '[!] Filtering found words ...'
 
@@ -66,10 +99,29 @@ function filter(){
   echo '[!] Finished filtering.'
 }
 
+# Grabs words from websites with CEWL.
+#
+# Parameters:
+#   1 - A full URL
+#   2 - A minimum word length
+#   3 - A maximum crawl depth
+#   4 - A run duration
+# Returns:
+#   None
 function grab(){
   echo '[!] Grabbing words ...'
   sudo timeout --signal=INT "$4" cewl "$1" -w "$OUT_PATH" -m $2 --with-numbers -d $3
 }
+
+# Runs wowlist.
+#
+# Parameters:
+#   1 - A full URL
+#   2 - A minimum word length
+#   3 - A maximum crawl depth
+#   4 - A run duration
+# Returns:
+#   None
 
 function wow(){
 
@@ -78,6 +130,12 @@ function wow(){
 
 }
 
+# Displays the section help.
+#
+# Parameters:
+#   1 - A section
+# Returns:
+#   None
 function help(){
   if [ "$1" = "params" ]; then
     logo
@@ -141,7 +199,7 @@ function help(){
     echo
     echo "|----------------------------------------------|"
     echo "| You need to indicate how long wowlist will   |"
-    echo "| search for words.                            |"
+    echo "| search for words (in seconds).               |"
     echo "|                                              |"
     echo "| Enter an integer as the fourth parameters.   |"
     echo "|                                              |"
@@ -152,6 +210,10 @@ function help(){
   fi
 }
 
+# Resolves wowlist directories.
+#
+# Returns:
+#   None
 function diresolve(){
   echo "[!] Resolving directory structure ..."
   if [ ! -d "$OUT_DIR" ]; then
@@ -162,6 +224,10 @@ function diresolve(){
   touch "$OUT_PATH"
 }
 
+# Resolves wowlist dependencies.
+#
+# Returns:
+#   None
 function pkgresolve(){
   echo "[!] Resolving dependencies ..."
   reqs="${PROJECT_DIR}/requirements.txt"
@@ -171,6 +237,15 @@ function pkgresolve(){
   echo "[!] Requirments satisfied."
 }
 
+# Defines the main function.
+#
+# Parameters:
+#   1 - A full URL
+#   2 - A minimum word length
+#   3 - A maximum crawl depth
+#   4 - A run duration
+# Returns:
+#   None
 function main(){
   clear
   if [ -n "$1" ]; then
