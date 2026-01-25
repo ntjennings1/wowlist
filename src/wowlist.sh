@@ -7,6 +7,8 @@ PROJECT_DIR=$(dirname "$SCRIPT_DIR")
 OUT_DIR="${PROJECT_DIR}/out"
 OUT_PATH="${OUT_DIR}/out.txt"
 FILTERED_PATH="${OUT_DIR}/filtered.txt"
+SHORTS_PATH="${OUT_DIR}/shorts.txt"
+LONGS_PATH="${OUT_DIR}/longs.txt"
 FORMAT_PATH="${SCRIPT_DIR}/format.csv"
 
 # Inputs
@@ -19,7 +21,9 @@ FORMAT=()
 
 # Placeholders
 FILTERED=()
-PERM=()
+PERMS=()
+SHORTS=()
+LONGS=()
 
 # Throws a specified exception.
 #
@@ -28,11 +32,7 @@ PERM=()
 # Returns:
 #   None
 function throw_exec(){
-  if [ "$1" = "params" ]; then
-    echo "[ERR] Requires valid parameters."
-    help params
-    exit
-  elif [ "$1" = "url" ]; then
+  if [ "$1" = "url" ]; then
     echo "[ERR] Missing URL."
     help url
     exit
@@ -70,126 +70,6 @@ EOF
 printf "${NC}"
 }
 
-# Iterates through array rows.
-#
-# Returns:
-#   None
-function iterate_rows(){
-  for rowname in "${FORMAT[@]}"; do
-    eval "cols=(\"\${$rowname[@]}\")"
-
-    for i in "${!cols[@]}"; do
-      if [ "$i" -eq 0 ]; then
-        printf "${cols[$i]}: "
-      else
-        printf "${cols[$i]}\n"
-      fi
-    done
-  done
-}
-
-function apply(){
-  echo
-}
-
-function permutate(){
-  echo
-}
-
-# Combines filtered words.
-#
-# Results:
-#   None
-function findformats(){
-  echo '[!] Grabbing formatting.'
-
-  local row=0
-  local -a fields
-  FORMAT=() # reset
-
-  while IFS=',' read -r -a fields; do
-    local rowname="row_$row"
-    FORMAT+=("$rowname") # create the row array dynamically
-    eval "$rowname=()"
-    for i in "${!fields[@]}"; do
-      eval "$rowname[$i]=\"${fields[$i]}\""
-    done
-    ((row++))
-  done < "$FORMAT_PATH"
-
-  echo '[!] Formatting acquired.'
-  iterate_rows "${FORMAT[@]}"
-}
-
-# Combines filtered words based on formatting.
-#
-# Returns:
-#   None
-function combine(){
-  echo '[!] Combining filtered words ...'
-
-  findformats
-  permutate
-  apply
-
-  echo '[!] Finished combining words ...'
-}
-
-# Filters the found words.
-#
-# Parameters:
-#   1 - The chosen minimum word length
-# Returns:
-#   None
-function filter(){
-  echo '[!] Filtering found words ...'
-
-  len="$1"
-  next=$((len++))
-  FILTERED=()
-
-  while IFS= read -r line; do
-    if [ "${#line}" -eq "$len" ]; then
-      FILTERED+=("$line")
-      echo "$line" >> "$FILTERED_PATH"
-    elif [ "${#line}" -eq "$next" ]; then
-      FILTERED+=("$line")
-      echo "$line" >> "$FILTERED_PATH"
-    fi
-  done < "$OUT_PATH"
-  echo '[!] Finished filtering.'
-}
-
-# Grabs words from websites with CEWL.
-#
-# Parameters:
-#   1 - A full URL
-#   2 - A minimum word length
-#   3 - A maximum crawl depth
-#   4 - A run duration
-# Returns:
-#   None
-function grab(){
-  echo '[!] Grabbing words ...'
-  sudo timeout --signal=INT "$4" cewl "$1" -w "$OUT_PATH" -m $2 --with-numbers -d $3
-}
-
-# Runs wowlist.
-#
-# Parameters:
-#   1 - A full URL
-#   2 - A minimum word length
-#   3 - A maximum crawl depth
-#   4 - A run duration
-# Returns:
-#   None
-function wow(){
-
-  grab $1 $2 $3 $4
-  filter $2
-  combine
-}
-
 # Displays the section help.
 #
 # Parameters:
@@ -197,21 +77,7 @@ function wow(){
 # Returns:
 #   None
 function help(){
-  if [ "$1" = "params" ]; then
-    logo
-    echo
-    echo "|--------------------------------------------------|"
-    echo "| Welcome to the WowList wordlist generation tool. |"
-    echo "|                                                  |"
-    echo "| Enter the following parameters in order:         |"
-    echo "|                                                  |"
-    echo "|     [1] Full URL                                 |"
-    echo "|     [2] Min Word Length                          |"
-    echo "|     [3] Max Crawl Depth                          |"
-    echo "|     [4] Run Duration                             |"
-    echo "|--------------------------------------------------|"
-    echo
-  elif [ "$1" = "url" ]; then
+  if [ "$1" = "url" ]; then
     logo
     echo
     echo "|----------------------------------------------|"
@@ -268,6 +134,149 @@ function help(){
     echo "|----------------------------------------------|"
     echo
   fi
+}
+
+# Iterates through array rows.
+#
+# Returns:
+#   None
+function iterate_rows(){
+  for rowname in "${FORMAT[@]}"; do
+    declare -n row="$rowname"
+    echo "$rowname : [${row[*]}]"
+  done
+}
+
+function apply(){
+  echo '[!] Applying found permutations ...'
+
+  #for
+
+  echo '[!] Permutations applied.'
+}
+
+function permutate(){
+  # Perform permutation
+  local items="$1"
+  local prefix="$2"
+  local i
+
+  # Base case: if no items are left, print the current permutation
+  if [[ -z "$items" ]]; then
+    PERMS+=("$prefix")
+    return
+  fi
+
+  # Recursive case: iterate through each character
+  for ((i = 0; i < ${#items}; i++)); do
+    permutate "${items:0:i}${items:i+1}" "$prefix${items:i:1}"
+  done
+}
+
+# Combines filtered words.
+#
+# Results:
+#   None
+function findformats(){
+  echo '[!] Grabbing formatting ...'
+
+  local row=0
+  local -a fields
+
+  while IFS=',' read -r -a fields; do
+    local rowname="row_$row"
+    FORMAT+=("$rowname") # create the row array dynamically
+    eval "$rowname=()"
+    for i in "${!fields[@]}"; do
+      eval "$rowname[$i]=\"${fields[$i]}\""
+    done
+    ((row++))
+  done < "$FORMAT_PATH"
+
+  echo '[!] Formatting acquired.'
+}
+
+# Combines filtered words based on formatting.
+#
+# Returns:
+#   None
+function combine(){
+  echo '[!] Combining filtered words ...'
+
+  findformats
+
+  # Store format to readable temp
+  temp=""
+  for rowname in "${FORMAT[@]}"; do
+    declare -n row="$rowname"
+    i=0
+    for item in "${row[@]}"; do
+      if [ "$i" = "0" ]; then
+        temp+="$item"
+      fi
+      ((i++))
+    done
+  done
+
+  echo '[!] Finding permutations ...'
+  permutate "$temp"
+  echo "[!] Permutations found : ${#PERMS[@]}"
+  apply
+  echo '[!] Finished combining words ...'
+}
+
+# Filters the found words.
+#
+# Parameters:
+#   1 - The chosen minimum word length
+# Returns:
+#   None
+function filter(){
+  echo '[!] Filtering found words ...'
+
+  len="$1"
+  next=$((len++))
+
+  while IFS= read -r line; do
+    if [ "${#line}" -eq "$len" ]; then
+      FILTERED+=("$line")
+      echo "$line" >> "$FILTERED_PATH"
+    elif [ "${#line}" -eq "$next" ]; then
+      FILTERED+=("$line")
+      echo "$line" >> "$FILTERED_PATH"
+    fi
+  done < "$OUT_PATH"
+  echo '[!] Finished filtering.'
+}
+
+# Grabs words from websites with CEWL.
+#
+# Parameters:
+#   1 - A full URL
+#   2 - A minimum word length
+#   3 - A maximum crawl depth
+#   4 - A run duration
+# Returns:
+#   None
+function grab(){
+  echo '[!] Grabbing words ...'
+  sudo timeout --signal=INT "$4" cewl "$1" -w "$OUT_PATH" -m $2 --with-numbers -d $3
+}
+
+# Runs wowlist.
+#
+# Parameters:
+#   1 - A full URL
+#   2 - A minimum word length
+#   3 - A maximum crawl depth
+#   4 - A run duration
+# Returns:
+#   None
+function wow(){
+
+  grab $1 $2 $3 $4
+  filter $2
+  combine
 }
 
 # Resolves wowlist directories.
