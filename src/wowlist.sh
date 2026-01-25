@@ -5,19 +5,19 @@ SCRIPT_PATH=$(readlink -f "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 PROJECT_DIR=$(dirname "$SCRIPT_DIR")
 OUT_DIR="${PROJECT_DIR}/out"
-OUT_PATH="${OUT_DIR}/out.txt"
+OUT_PATH="${OUT_DIR}/temp.txt"
 FILTERED_PATH="${OUT_DIR}/filtered.txt"
 SHORTS_PATH="${OUT_DIR}/shorts.txt"
 LONGS_PATH="${OUT_DIR}/longs.txt"
+WOW_PATH="${OUT_DIR}/wowlist.txt"
 FORMAT_PATH="${SCRIPT_DIR}/format.csv"
 
 # Inputs
-SYMS=( '!' '#' '&' '*'
-       '-' '_' '=' '+'
-       ',' '.' '?' '~' '|' )
+FORMAT=()
+SYMS=( '!' '#' '&'
+       '-' '_' '=')
 NUMS=(1 2 3 4 5 6 7 8 9 0)
 SPACE=" "
-FORMAT=()
 
 # Placeholders
 FILTERED=()
@@ -149,8 +149,62 @@ function iterate_rows(){
 
 function apply(){
   echo '[!] Applying found permutations ...'
+  a=$1[@]
+  types=("${!a}")
+  shorts_avail="${#SHORTS[@]}"
+  longs_avail="${#LONGS[@]}"
+  nums_avail="${#NUMS[@]}"
+  syms_avail="${#SYMS[@]}"
+  # Per filtered word
+  for word in "${FILTERED[@]}"; do
+    temp=""
+    # Per found permutation
+    for i in "${PERMS[@]}"; do
+      # Per permutation entry
+      for (( j=0; j<${#i}; j++ )); do
+        char="${i:j:1}"
+        id=1
+        which=""
+        # Per types in the format
+        for f in "${types[@]}"; do
+          if [ "$char" = "$id" ]; then
+            which="$f"
+          fi
+          ((id++))
+        done
 
-  #for
+        case "$which" in
+          short)
+            pos=$( shuf -i 0-"$shorts_avail" -n 1 )
+            temp+="${SHORTS[$pos]}"
+            ;;
+          long)
+            pos=$( shuf -i 0-"$longs_avail" -n 1 )
+            temp+="${LONGS[$pos]}"
+            ;;
+          num)
+            pos=$( shuf -i 0-"$nums_avail" -n 1 )
+            temp+="${NUMS[$pos]}"
+            ;;
+          sym)
+            pos=$( shuf -i 0-"$syms_avail" -n 1 )
+            temp+="${SYMS[$pos]}"
+            ;;
+          space)
+            pos=$( shuf -i 0-1 -n 1 )
+            if [ "$pos" = "1" ]; then
+              temp+="$SPACE"
+            fi
+            ;;
+          *)
+            echo '[ERR] Unknown choice.'
+            ;;
+        esac
+      done
+      echo "$temp" >> "$WOW_PATH"
+      temp=""
+    done
+  done
 
   echo '[!] Permutations applied.'
 }
@@ -206,6 +260,7 @@ function combine(){
   findformats
 
   # Store format to readable temp
+  type=()
   temp=""
   for rowname in "${FORMAT[@]}"; do
     declare -n row="$rowname"
@@ -213,6 +268,8 @@ function combine(){
     for item in "${row[@]}"; do
       if [ "$i" = "0" ]; then
         temp+="$item"
+      else
+        type+=("$item")
       fi
       ((i++))
     done
@@ -221,7 +278,7 @@ function combine(){
   echo '[!] Finding permutations ...'
   permutate "$temp"
   echo "[!] Permutations found : ${#PERMS[@]}"
-  apply
+  apply type
   echo '[!] Finished combining words ...'
 }
 
@@ -240,10 +297,14 @@ function filter(){
   while IFS= read -r line; do
     if [ "${#line}" -eq "$len" ]; then
       FILTERED+=("$line")
+      SHORTS+=("$line")
       echo "$line" >> "$FILTERED_PATH"
+      echo "$line" >> "$SHORTS_PATH"
     elif [ "${#line}" -eq "$next" ]; then
       FILTERED+=("$line")
+      LONGS+=("$line")
       echo "$line" >> "$FILTERED_PATH"
+      echo "$line" >> "$LONGS_PATH"
     fi
   done < "$OUT_PATH"
   echo '[!] Finished filtering.'
@@ -277,6 +338,7 @@ function wow(){
   grab $1 $2 $3 $4
   filter $2
   combine
+  "./$SRCIPT_DIR/eval.sh"
 }
 
 # Resolves wowlist directories.
