@@ -14,8 +14,9 @@ FORMAT_PATH="${SCRIPT_DIR}/format.csv"
 
 # Inputs
 FORMAT=()
-SYMS=( '!' '#' '&'
-       '-' '_' '=')
+SYMS=( '!' '@' '#' '$' '%' '&'
+       '*' '?' '_' '^' '~' '='
+       '-' '+' '<' '>' '(' ')')
 NUMS=(1 2 3 4 5 6 7 8 9 0)
 SPACE=" "
 
@@ -147,6 +148,10 @@ function iterate_rows(){
   done
 }
 
+# Applied found permutations
+#
+# Returns:
+#   None
 function apply(){
   echo '[!] Applying found permutations ...'
   a=$1[@]
@@ -209,6 +214,13 @@ function apply(){
   echo '[!] Permutations applied.'
 }
 
+# Permutate each array.
+#
+# Parameters:
+#   1 - Array of elements
+#   2 - Array prefix
+# Returns:
+#   None
 function permutate(){
   # Perform permutation
   local items="$1"
@@ -321,6 +333,10 @@ function filter(){
 #   None
 function grab(){
   echo '[!] Grabbing words ...'
+  echo "[-->] URL: $1"
+  echo "[-->] Minimum word length: $2"
+  echo "[-->] Maximum crawl depth: $3"
+  echo "[-->] Run duration: $4"
   sudo timeout --signal=INT "$4" cewl "$1" -w "$OUT_PATH" -m $2 --with-numbers -d $3
 }
 
@@ -338,7 +354,7 @@ function wow(){
   grab $1 $2 $3 $4
   filter $2
   combine
-  "./$SRCIPT_DIR/eval.sh"
+  './'"$SRCIPT_DIR"'/eval.sh'
 }
 
 # Resolves wowlist directories.
