@@ -2,11 +2,19 @@
 
 A wordlist generation wrapper.
 
+## OS Requirements
+
+WowList was developed for use with the following operating systems. Using others may not produce expected results.
+```
+- Kali Linux 6.12.13-amd64
+```
+
 ## Software Requirements
 
-Developing wowlist required the following open-source software packages.
-
+WowList was developed for use with the following open-source softwares. Using other frameworks may not produce expected results.
+```
 - cewl 6.2.1-1
+```
 
 ## Usage
 
@@ -36,7 +44,7 @@ Once inside the coned directory, users can enter the following script to use wow
 ./src/wowlist.sh
 ```
 
-### Parameters
+#### Parameters
 
 Users must indicate valid parameters before obtaining a curated wordlist.
 
@@ -44,6 +52,13 @@ Users must indicate valid parameters before obtaining a curated wordlist.
 - [x] Minimum word length
 - [x] Maximum crawl depth
 - [x] Run duration
+
+#### Example Run
+
+This script will crawl YouTube for at most 10 layers, seek words with at least 6 letters, and last 10 seconds.
+```
+./$WOWLIST_HOME/src/wowlist.sh https://www.youtube.com 6 10 10
+```
 
 ## Metrics
 
