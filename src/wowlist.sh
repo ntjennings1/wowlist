@@ -156,17 +156,20 @@ function apply(){
   echo '[!] Applying found permutations ...'
   a=$1[@]
   types=("${!a}")
-  shorts_avail="${#SHORTS[@]}"
-  longs_avail="${#LONGS[@]}"
-  nums_avail="${#NUMS[@]}"
-  syms_avail="${#SYMS[@]}"
+  shorts_avail=`expr ${#SHORTS[@]} - 1`
+  longs_avail=`expr ${#LONGS[@]} - 1`
+  nums_avail=`expr ${#NUMS[@]} - 1`
+  syms_avail=`expr ${#SYMS[@]} - 1`
   # Per filtered word
   for word in "${FILTERED[@]}"; do
-    temp=""
+
     # Per found permutation
     for i in "${PERMS[@]}"; do
+
+      temp=""
       # Per permutation entry
       for (( j=0; j<${#i}; j++ )); do
+
         char="${i:j:1}"
         id=1
         which=""
@@ -174,6 +177,7 @@ function apply(){
         for f in "${types[@]}"; do
           if [ "$char" = "$id" ]; then
             which="$f"
+            break
           fi
           ((id++))
         done
@@ -194,6 +198,15 @@ function apply(){
           sym)
             pos=$( shuf -i 0-"$syms_avail" -n 1 )
             temp+="${SYMS[$pos]}"
+            ;;
+          rand)
+            tmp=""
+            sz=$( shuf -i 3-6 -n 1 )
+            for (( c=0; c<$sz; c++ )); do
+              which=$( shuf -i 0-$nums_avail -n 1 )
+              tmp+="${NUMS[$which]}"
+            done
+            temp+="$tmp"
             ;;
           space)
             pos=$( shuf -i 0-1 -n 1 )
@@ -304,7 +317,7 @@ function filter(){
   echo '[!] Filtering found words ...'
 
   len="$1"
-  next=$((len++))
+  next=`expr $len + 1`
 
   while IFS= read -r line; do
     if [ "${#line}" -eq "$len" ]; then
