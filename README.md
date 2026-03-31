@@ -36,10 +36,30 @@ Next, enter the directory of the wowlist project:
 ```
 cd $WOWLIST_HOME
 ```
+### Formats
+
+Wowlist depends on a predefined format to craft custom passwords. This format is located in the following file:
+```
+./src/format.csv
+```
+
+This file details formats by listing slot types. The following directory has some example formats for you to experiment with:
+```
+./src/formats/
+```
+
+#### Slots
+
+Slot types include:
+- "short" --> a short word
+- "long" --> a long word
+- "num" --> a number
+- "sym" --> a symbol
+- "rand" --> a randomized set of numbers
 
 ### Running
 
-Once inside the coned directory, users can enter the following script to use wowlist features:
+Once inside the cloned directory, users must use the wowlist script:
 ```
 ./src/wowlist.sh
 ```
