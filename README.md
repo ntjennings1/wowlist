@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="src/images/wowlist.png" alt="WowList Logo" style="width=5">
+	<img src="src/images/wowlist.png" alt="WowList Logo" width=500>
 	<h1 align="center"> WowList  </h1>
 </p>
 
