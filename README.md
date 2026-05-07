@@ -1,4 +1,7 @@
-# Wowlist
+<p align="center">
+	<img src="src/images/wowlist.png" alt="WowList Logo" style="width=5">
+	<h1 align="center"> WowList  </h1>
+</p>
 
 A wordlist generation wrapper.
 
@@ -24,7 +27,7 @@ This section will cover how to download and run the wowlist generator to your li
 
 First, clone the repo:
 ```
-git clone https://www.github.com/ntjennings1/wowlist.git
+git clone https://www.github.com/ntjennings1/wowlist.git $WOWLIST_HOME
 ```
 
 Be sure to give the file execution permissions (with admin privileges):
@@ -36,30 +39,10 @@ Next, enter the directory of the wowlist project:
 ```
 cd $WOWLIST_HOME
 ```
-### Formats
-
-Wowlist depends on a predefined format to craft custom passwords. This format is located in the following file:
-```
-./src/format.csv
-```
-
-This file details formats by listing slot types. The following directory has some example formats for you to experiment with:
-```
-./src/formats/
-```
-
-#### Slots
-
-Slot types include:
-- "short" --> a short word
-- "long" --> a long word
-- "num" --> a number
-- "sym" --> a symbol
-- "rand" --> a randomized set of numbers
 
 ### Running
 
-Once inside the cloned directory, users must use the wowlist script:
+Once inside the coned directory, users can enter the following script to use wowlist features:
 ```
 ./src/wowlist.sh
 ```
@@ -68,10 +51,10 @@ Once inside the cloned directory, users must use the wowlist script:
 
 Users must indicate valid parameters before obtaining a curated wordlist.
 
-- [x] URL to grab words from
-- [x] Minimum word length
-- [x] Maximum crawl depth
-- [x] Run duration
+	[x] URL to grab words from
+	[x] Minimum word length
+	[x] Maximum crawl depth
+	[x] Run duration
 
 #### Example Run
 
